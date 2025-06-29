@@ -87,16 +87,19 @@ pipeline {
         stage("Trigger Deployment") {
              steps {
                 script {
-                   withCredentials([string(credentialsId: 'JENKINS_API_TOKEN', variable: 'API_TOKEN')]) {
-                      sh '''
-                       curl -v -k --user kumar:$API_TOKEN \
-                      -X POST \
-                      -H 'cache-control: no-cache' \
-                      -H 'content-type: application/x-www-form-urlencoded' \
-                      --data "IMAGE_TAG=${IMAGE_TAG}" \
-                      "http://ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token&IMAGE_TAG=${IMAGE_TAG}"
-                     '''
-                    }
+                //    withCredentials([string(credentialsId: 'JENKINS_API_TOKEN', variable: 'API_TOKEN')]) {
+                //       sh '''
+                //        curl -v -k --user admin:$API_TOKEN \
+                //       -X POST \
+                //       -H 'cache-control: no-cache' \
+                //       -H 'content-type: application/x-www-form-urlencoded' \
+                //       --data-urlencode "IMAGE_TAG=${IMAGE_TAG}" \
+                //       "http://ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token&IMAGE_TAG=${IMAGE_TAG}"
+                //      '''
+                //     }
+                      build job: 'gitops-cd', parameters: [
+                             string(name: 'IMAGE_TAG', value: IMAGE_TAG)
+                        ]
                 }
              }
         }         
