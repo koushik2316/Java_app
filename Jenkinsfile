@@ -13,13 +13,13 @@ pipeline {
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE_VERSION}-${BUILD_NUMBER}"
-        // JENKINS_API_TOKEN = credentials('JENKINS_API_TOKEN')
+        JENKINS_API_TOKEN = credentials('JENKINS_API_TOKEN')
     }
     stages{
         stage("Cleanup Workspace"){
              steps{
                 cleanWs()
-             }
+           }
         }
 
         stage("Checkout from SCM"){
@@ -83,22 +83,16 @@ pipeline {
                    sh "docker rmi ${IMAGE_NAME}:latest"
                }
            }
-       }
+        }
        stage("Trigger Deployment"){
             steps{
-                script {
-                    withCredentials([string(credentialsId: 'JENKINS_API_TOKEN', variable: 'API_TOKEN')]) {
-                        sh """
-                        curl -v -k --user kumar:${API_TOKEN}\\
-                        -X POST \\
-                        -H 'cache-control: no-cache'\\
-                        -H 'content-type: application/x-www-form-urlencoded' \\
-                        --data 'IMAGE_TAG=${IMAGE_TAG}' \\
-                        'http://ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token'"
-                        """
-                    }
+                script{
+                        echo "Triggering Deployment Job"                 
+                        sh "curl -v -k --user kumar:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'http://ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token'"
+                }
+                    
                 }
             }
         }
    }
-}
+
