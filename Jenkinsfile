@@ -13,6 +13,7 @@ pipeline {
         DOCKER_PASS = 'dockerhub'
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE_VERSION}-${BUILD_NUMBER}"
+        JENKINS_API_TOKEN = credentials('JENKINS_API_TOKEN')
     }
     stages{
         stage("Cleanup Workspace"){
@@ -83,5 +84,12 @@ pipeline {
                }
            }
        }
+       stage("Trigger Deployment"){
+            steps{
+                script {
+                    sh "curl -v -k --user kumar:${JENKINS_API_TOKEN} -X POST -H 'cache-control: no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAGE_TAG}' 'ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token'"
+                }
+            }
+        }
    }
 }
