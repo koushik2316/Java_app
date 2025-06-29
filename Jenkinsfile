@@ -88,14 +88,14 @@ pipeline {
              steps {
                 script {
                    withCredentials([string(credentialsId: 'JENKINS_API_TOKEN', variable: 'API_TOKEN')]) {
-                      sh '''
-                      curl -v -k --user kumar:$API_TOKEN \
+                      sh """"
+                       curl -v -k --user kumar:$API_TOKEN \
                       -X POST \
                       -H 'cache-control: no-cache' \
                       -H 'content-type: application/x-www-form-urlencoded' \
                       --data "IMAGE_TAG=${IMAGE_TAG}" \
-                      "http://ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token"
-                   '''
+                      "http://ec2-100-24-20-37.compute-1.amazonaws.com:8080/job/gitops-cd/buildWithParameters?token=gitops-token&IMAGE_TAG=${IMAGE_TAG}"
+                   """
                     }
                 }
              }
